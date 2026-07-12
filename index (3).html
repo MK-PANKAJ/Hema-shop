@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RIDE-N-SHINE | Grand Opening</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow+Condensed:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<style>
+  :root{
+    --navy:#0B1A33;
+    --navy-deep:#060F20;
+    --red:#E2122A;
+    --red-dark:#A80E20;
+    --white:#F7F8FA;
+    --steel:#8FA0BD;
+    --gold:#E8B94A;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    background:var(--navy-deep);
+    color:var(--white);
+    font-family:'Inter',sans-serif;
+    overflow-x:hidden;
+  }
+  body.locked{overflow:hidden; height:100vh;}
+  h1,h2,h3,.display{
+    font-family:'Bebas Neue',sans-serif;
+    letter-spacing:0.03em;
+  }
+  .eyebrow{
+    font-family:'Barlow Condensed',sans-serif;
+    font-weight:700;
+    letter-spacing:0.35em;
+    text-transform:uppercase;
+  }
+  .stripe-bg{
+    background:
+      repeating-linear-gradient(
+        115deg,
+        rgba(226,18,42,0.10) 0px,
+        rgba(226,18,42,0.10) 2px,
+        transparent 2px,
+        transparent 46px
+      );
+  }
+  .asphalt{
+    background-color:var(--navy-deep);
+    background-image:
+      radial-gradient(circle at 15% 20%, rgba(226,18,42,0.18), transparent 40%),
+      radial-gradient(circle at 85% 75%, rgba(143,160,189,0.12), transparent 45%);
+  }
+
+  /* ================= ENVELOPE GATE ================= */
+  #gate{
+    position:fixed; inset:0; z-index:100;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    background:var(--navy-deep);
+    background-image:
+      radial-gradient(circle at 20% 15%, rgba(226,18,42,0.22), transparent 45%),
+      radial-gradient(circle at 80% 85%, rgba(232,185,74,0.10), transparent 45%);
+    transition:opacity .9s ease, visibility .9s ease;
+  }
+  #gate.hide{opacity:0; visibility:hidden; pointer-events:none;}
+
+  .env-stage{
+    position:relative;
+    width:300px; height:210px;
+    max-width:80vw;
+    perspective:1400px;
+  }
+  .env-body{
+    position:absolute; inset:0;
+    border-radius:6px;
+    background:
+      linear-gradient(135deg, #C4102A, #8E0C20 60%);
+    box-shadow:0 25px 60px -15px rgba(0,0,0,0.6);
+    overflow:hidden;
+  }
+  .env-pocket{
+    position:absolute; left:0; right:0; bottom:0; height:62%;
+    background:linear-gradient(160deg, rgba(255,255,255,0.05), transparent 60%);
+    clip-path:polygon(0 100%, 50% 30%, 100% 100%);
+    border-top:1px solid rgba(255,255,255,0.15);
+  }
+  .env-flap{
+    position:absolute; top:0; left:0; width:100%; height:58%;
+    background:linear-gradient(150deg, #D6203A, #A20E20 75%);
+    clip-path:polygon(0 0, 100% 0, 50% 100%);
+    transform-origin:top center;
+    transition:transform 1s cubic-bezier(.4,0,.2,1);
+    z-index:3;
+  }
+  .env-flap::after{
+    content:"";
+    position:absolute; inset:0;
+    background:repeating-linear-gradient(45deg, rgba(255,255,255,0.05) 0 2px, transparent 2px 18px);
+    clip-path:polygon(0 0, 100% 0, 50% 100%);
+  }
+  #gate.open .env-flap{ transform:rotateX(178deg); }
+
+  .env-seal{
+    position:absolute; top:44%; left:50%;
+    width:64px; height:64px;
+    background:radial-gradient(circle at 35% 30%, #FBEFC9, var(--gold) 55%, #B98A26 100%);
+    border-radius:50%;
+    transform:translate(-50%,-50%);
+    display:flex; align-items:center; justify-content:center;
+    box-shadow:0 6px 14px rgba(0,0,0,0.4);
+    z-index:4;
+    transition:opacity .4s ease, transform .4s ease;
+    cursor:pointer;
+  }
+  .env-seal span{
+    font-family:'Bebas Neue',sans-serif;
+    font-size:1.5rem;
+    color:#5C3E0B;
+    letter-spacing:0.03em;
+  }
+  #gate.open .env-seal{ opacity:0; transform:translate(-50%,-50%) scale(0.6); }
+
+  .env-card{
+    position:absolute; left:10%; right:10%; top:14%; height:70%;
+    background:var(--white);
+    border-radius:8px;
+    box-shadow:0 10px 30px rgba(0,0,0,0.35);
+    z-index:2;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    gap:6px;
+    transform:translateY(6%) scale(0.94);
+    opacity:0;
+  }
+  #gate.open .env-card{
+    animation:cardFly 1.7s cubic-bezier(.3,.7,.25,1) .35s forwards;
+  }
+  @keyframes cardFly{
+    0%   { opacity:0; transform:translateY(6%) scale(0.94); }
+    18%  { opacity:1; transform:translateY(0) scale(1); }
+    62%  { opacity:1; transform:translateY(-55vh) scale(1.05); }
+    100% { opacity:0; transform:translateY(-160vh) scale(1.1); }
+  }
+  .env-card img{ width:auto; height:46px; object-fit:contain; border-radius:8px; }
+  .env-card .brand-word{
+    font-family:'Bebas Neue',sans-serif;
+    color:var(--navy);
+    font-size:1.15rem;
+    letter-spacing:0.04em;
+  }
+  .env-card .brand-sub{
+    font-family:'Barlow Condensed',sans-serif;
+    color:var(--red);
+    font-size:0.65rem;
+    font-weight:700;
+    letter-spacing:0.25em;
+  }
+
+  .tap-label{
+    margin-top:34px;
+    font-family:'Barlow Condensed',sans-serif;
+    letter-spacing:0.3em;
+    font-size:0.8rem;
+    color:var(--steel);
+    animation:pulse 2s ease-in-out infinite;
+  }
+  @keyframes pulse{ 0%,100%{opacity:.5;} 50%{opacity:1;} }
+  #gate.open .tap-label{opacity:0; transition:opacity .3s ease;}
+
+  /* ================= GAUGE (hero) ================= */
+  .gauge-wrap{
+    position:relative;
+    width:280px; height:280px;
+    max-width:78vw; max-height:78vw;
+  }
+  .gauge-needle{
+    transform-origin:140px 140px;
+    transform:rotate(-120deg);
+    animation:needleSweep 2.6s cubic-bezier(.2,.9,.25,1) forwards;
+    animation-delay:1.6s;
+  }
+  @keyframes needleSweep{
+    0%{transform:rotate(-120deg);}
+    55%{transform:rotate(150deg);}
+    75%{transform:rotate(95deg);}
+    100%{transform:rotate(112deg);}
+  }
+  .tick-glow{filter:drop-shadow(0 0 4px rgba(232,185,74,0.55));}
+
+  /* ---- Infinite brands marquee ---- */
+  .scrolling-text-container{
+    background:transparent;
+    overflow:hidden;
+    padding:24px 0;
+  }
+  .scrolling-text-inner{
+    display:flex;
+    white-space:nowrap;
+  }
+  .scrolling-text{
+    display:flex;
+    align-items:center;
+    gap:24px;
+    padding:0 12px;
+    flex-shrink:0;
+  }
+  .scrolling-text-inner > div{
+    animation:var(--direction) var(--marquee-speed) linear infinite;
+  }
+  .scrolling-text-container:hover .scrolling-text-inner > div{
+    animation-play-state:paused;
+  }
+  @keyframes scroll-left{
+    0%{ transform:translateX(0%); }
+    100%{ transform:translateX(-100%); }
+  }
+  @keyframes scroll-right{
+    0%{ transform:translateX(-100%); }
+    100%{ transform:translateX(0%); }
+  }
+  .logo-chip{
+    background:#fff;
+    border-radius:14px;
+    display:flex; align-items:center; justify-content:center;
+    width:150px; height:90px;
+    padding:14px;
+    box-shadow:0 8px 20px rgba(0,0,0,0.25);
+  }
+  .logo-chip img{ max-width:100%; max-height:100%; object-fit:contain; }
+
+  .service-card{
+    background:linear-gradient(160deg, rgba(255,255,255,0.05), rgba(255,255,255,0.015));
+    border:1px solid rgba(255,255,255,0.08);
+    transition:transform .35s ease, border-color .35s ease, background .35s ease;
+  }
+  .service-card:hover{
+    transform:translateY(-6px);
+    border-color:rgba(226,18,42,0.5);
+    background:linear-gradient(160deg, rgba(226,18,42,0.10), rgba(255,255,255,0.02));
+  }
+  .rsvp-btn{ background:var(--red); box-shadow:0 8px 24px -6px rgba(226,18,42,0.6); }
+  .rsvp-btn:hover{background:var(--red-dark);}
+  .flag-divider{
+    height:10px;
+    background-image: linear-gradient(45deg, #fff 25%, transparent 25%, transparent 75%, #fff 75%, #fff),
+                       linear-gradient(45deg, #fff 25%, transparent 25%, transparent 75%, #fff 75%, #fff);
+    background-size:20px 20px;
+    background-position:0 0, 10px 10px;
+    background-color:var(--navy-deep);
+    opacity:0.9;
+  }
+  .countdown-box{ background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.1); }
+  .shop-badge{
+    width:161px; height:80px; border-radius:12px; overflow:hidden;
+    background:#0A0A0A; display:flex; align-items:center; justify-content:center;
+    border:0.5px solid rgba(255,255,255,0.15);
+  }
+  .shop-badge img{ width:100%; height:100%; object-fit:contain; }
+
+  @media (prefers-reduced-motion: reduce){
+    .gauge-needle{animation:none; transform:rotate(112deg);}
+    .scrolling-text-inner > div{animation:none;}
+  }
+</style>
+</head>
+<body class="asphalt locked">
+
+<!-- ============ ENVELOPE GATE ============ -->
+<div id="gate">
+  <div class="env-stage" id="envStage">
+    <div class="env-body"></div>
+    <div class="env-pocket"></div>
+
+    <div class="env-card" id="envCard">
+      <img src="Untitled - 13 July 2026 at 01.01.13.png" alt="Ride-N-Shine logo">
+      <div class="brand-word">RIDE-N-SHINE</div>
+      <div class="brand-sub">GRAND OPENING</div>
+    </div>
+
+    <div class="env-flap" id="envFlap"></div>
+    <div class="env-seal" id="envSeal" role="button" aria-label="Tap to reveal invitation"><span>RS</span></div>
+  </div>
+  <p class="tap-label">TAP TO REVEAL</p>
+</div>
+
+<!-- ============ HERO ============ -->
+<header class="relative stripe-bg pt-10 pb-16 px-6 md:px-12 border-b border-white/10">
+  <div class="max-w-6xl mx-auto">
+    <div class="flex flex-col items-center text-center">
+
+      <div class="shop-badge mb-4">
+        <img src="Untitled - 13 July 2026 at 01.05.27 (1).png" alt="Ride-N-Shine">
+      </div>
+
+      <div class="flex items-center gap-2 eyebrow text-[11px] md:text-xs text-[var(--gold)] mb-6">
+        <span class="w-8 h-px bg-[var(--gold)]/60"></span>
+        MULTI BRAND TWO WHEELER SHOWROOM
+        <span class="w-8 h-px bg-[var(--gold)]/60"></span>
+      </div>
+
+      <h1 class="display text-6xl sm:text-7xl md:text-8xl leading-[0.9] text-white">
+        RIDE<span class="text-[var(--red)]">-</span>N<span class="text-[var(--red)]">-</span>SHINE
+      </h1>
+      <p class="eyebrow text-sm md:text-base text-[var(--steel)] mt-3">RIDE MORE &nbsp;•&nbsp; WORRY LESS</p>
+
+      <!-- Gauge -->
+      <div class="gauge-wrap my-10">
+        <svg viewBox="0 0 280 280" class="w-full h-full">
+          <circle cx="140" cy="140" r="128" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="10"/>
+          <circle cx="140" cy="140" r="128" fill="none" stroke="rgba(143,160,189,0.35)" stroke-width="10" stroke-linecap="round"
+                  stroke-dasharray="670.21 134.04" transform="rotate(120 140 140)"/>
+          <circle cx="140" cy="140" r="128" fill="none" stroke="var(--red)" stroke-width="10" stroke-linecap="round"
+                  stroke-dasharray="100.53 703.72" transform="rotate(15 140 140)"/>
+          <g class="tick-glow" stroke="var(--gold)" stroke-width="3">
+            <line x1="140" y1="18" x2="140" y2="34"/>
+          </g>
+          <g stroke="rgba(255,255,255,0.6)" stroke-width="2">
+            <line x1="140" y1="16" x2="140" y2="30" transform="rotate(-60 140 140)"/>
+            <line x1="140" y1="16" x2="140" y2="30" transform="rotate(-30 140 140)"/>
+            <line x1="140" y1="16" x2="140" y2="30"/>
+            <line x1="140" y1="16" x2="140" y2="30" transform="rotate(30 140 140)"/>
+            <line x1="140" y1="16" x2="140" y2="30" transform="rotate(60 140 140)"/>
+            <line x1="140" y1="16" x2="140" y2="30" transform="rotate(90 140 140)"/>
+            <line x1="140" y1="16" x2="140" y2="30" transform="rotate(120 140 140)"/>
+            <line x1="140" y1="16" x2="140" y2="30" transform="rotate(150 140 140)"/>
+          </g>
+          <g class="gauge-needle">
+            <line x1="140" y1="140" x2="140" y2="38" stroke="var(--red)" stroke-width="4" stroke-linecap="round"/>
+          </g>
+          <circle cx="140" cy="140" r="10" fill="var(--gold)"/>
+          <text x="140" y="185" text-anchor="middle" fill="#fff" font-family="Bebas Neue" font-size="22" letter-spacing="2">GRAND OPENING</text>
+          <text x="140" y="205" text-anchor="middle" fill="var(--steel)" font-family="Barlow Condensed" font-size="13" letter-spacing="1">22 JUL 2026</text>
+        </svg>
+      </div>
+
+      <h2 class="display text-white text-3xl sm:text-4xl md:text-5xl leading-tight max-w-3xl">
+        You're invited to the Grand Opening of<br class="sm:hidden"> <span class="text-[var(--red)] whitespace-nowrap">RIDE-N-SHINE!</span>
+      </h2>
+
+      <p class="mt-5 text-[var(--steel)] max-w-xl text-base md:text-lg">
+        Hawan ceremony begins promptly at <span class="text-white font-semibold">9:00 AM</span>, followed by the showroom inauguration and celebrations.
+      </p>
+
+      <div class="eyebrow text-[var(--gold)] text-lg md:text-xl mt-4 tracking-[0.25em]">
+        WEDNESDAY &nbsp;•&nbsp; JULY 22, 2026
+      </div>
+
+      <!-- Countdown -->
+      <div id="countdown" class="grid grid-cols-4 gap-3 md:gap-5 mt-8 w-full max-w-md">
+        <div class="countdown-box rounded-lg py-3">
+          <div id="cd-days" class="display text-3xl md:text-4xl text-white">00</div>
+          <div class="eyebrow text-[10px] text-[var(--steel)] mt-1">DAYS</div>
+        </div>
+        <div class="countdown-box rounded-lg py-3">
+          <div id="cd-hours" class="display text-3xl md:text-4xl text-white">00</div>
+          <div class="eyebrow text-[10px] text-[var(--steel)] mt-1">HOURS</div>
+        </div>
+        <div class="countdown-box rounded-lg py-3">
+          <div id="cd-mins" class="display text-3xl md:text-4xl text-white">00</div>
+          <div class="eyebrow text-[10px] text-[var(--steel)] mt-1">MINS</div>
+        </div>
+        <div class="countdown-box rounded-lg py-3">
+          <div id="cd-secs" class="display text-3xl md:text-4xl text-white">00</div>
+          <div class="eyebrow text-[10px] text-[var(--steel)] mt-1">SECS</div>
+        </div>
+      </div>
+
+      <a href="https://wa.me/918368695505?text=I'll%20be%20there%20for%20the%20RIDE-N-SHINE%20Grand%20Opening%20on%20July%2022%2C%202026!"
+         target="_blank" rel="noopener"
+         class="rsvp-btn mt-10 inline-flex items-center gap-3 text-white font-semibold text-lg px-9 py-4 rounded-full hover:-translate-y-0.5 transition-all">
+        <i class="fa-brands fa-whatsapp text-2xl"></i> RSVP Now
+      </a>
+    </div>
+  </div>
+</header>
+
+<div class="flag-divider"></div>
+
+<!-- ============ BRANDS ============ -->
+<section class="py-16 px-6 md:px-12 bg-[var(--navy)]">
+  <div class="max-w-6xl mx-auto text-center">
+    <p class="eyebrow text-[var(--gold)] text-xs mb-2">UNDER ONE ROOF</p>
+    <h2 class="display text-4xl md:text-5xl text-white mb-10">Brands We Carry</h2>
+  </div>
+  <div class="scrolling-text-container border-y border-white/10">
+    <div class="scrolling-text-inner" style="--marquee-speed:24s;">
+      <div class="scrolling-text" style="--direction:scroll-left;">
+        <div class="scrolling-text-item logo-chip"><img src="hero.svg" alt="Hero"></div>
+        <div class="scrolling-text-item logo-chip"><img src="images.png" alt="Honda"></div>
+        <div class="scrolling-text-item logo-chip"><img src="Untitled - 13 July 2026 at 01.41.32.png" alt="Bajaj"></div>
+        <div class="scrolling-text-item logo-chip"><img src="cdnlogo.com_yamaha-logo.svg" alt="Yamaha"></div>
+        <div class="scrolling-text-item logo-chip"><img src="cdnlogo.com_suzuki-logo.svg" alt="Suzuki"></div>
+        <div class="scrolling-text-item logo-chip"><img src="Untitled - 13 July 2026 at 01.49.12.png" alt="TVS"></div>
+      </div>
+      <div class="scrolling-text" style="--direction:scroll-left;" aria-hidden="true">
+        <div class="scrolling-text-item logo-chip"><img src="hero.svg" alt="Hero"></div>
+        <div class="scrolling-text-item logo-chip"><img src="images.png" alt="Honda"></div>
+        <div class="scrolling-text-item logo-chip"><img src="Untitled - 13 July 2026 at 01.41.32.png" alt="Bajaj"></div>
+        <div class="scrolling-text-item logo-chip"><img src="cdnlogo.com_yamaha-logo.svg" alt="Yamaha"></div>
+        <div class="scrolling-text-item logo-chip"><img src="cdnlogo.com_suzuki-logo.svg" alt="Suzuki"></div>
+        <div class="scrolling-text-item logo-chip"><img src="Untitled - 13 July 2026 at 01.49.12.png" alt="TVS"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ SERVICES ============ -->
+<section class="py-20 px-6 md:px-12">
+  <div class="max-w-6xl mx-auto">
+    <div class="text-center mb-14">
+      <p class="eyebrow text-[var(--gold)] text-xs mb-2">EVERYTHING FOR YOUR RIDE</p>
+      <h2 class="display text-4xl md:text-5xl text-white">Our Services</h2>
+    </div>
+    <div class="grid grid-cols-2 md:grid-cols-5 gap-5">
+      <div class="service-card rounded-xl p-6 text-center">
+        <i class="fa-solid fa-motorcycle text-3xl text-[var(--red)] mb-4"></i>
+        <p class="font-semibold text-white">Sales</p>
+      </div>
+      <div class="service-card rounded-xl p-6 text-center">
+        <i class="fa-solid fa-indian-rupee-sign text-3xl text-[var(--red)] mb-4"></i>
+        <p class="font-semibold text-white">Finance Available</p>
+      </div>
+      <div class="service-card rounded-xl p-6 text-center">
+        <i class="fa-solid fa-shield-halved text-3xl text-[var(--red)] mb-4"></i>
+        <p class="font-semibold text-white">Insurance</p>
+      </div>
+      <div class="service-card rounded-xl p-6 text-center">
+        <i class="fa-solid fa-arrows-rotate text-3xl text-[var(--red)] mb-4"></i>
+        <p class="font-semibold text-white">Exchange Facility</p>
+      </div>
+      <div class="service-card rounded-xl p-6 text-center col-span-2 md:col-span-1">
+        <i class="fa-solid fa-wrench text-3xl text-[var(--red)] mb-4"></i>
+        <p class="font-semibold text-white">Accessories</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="flag-divider"></div>
+
+<!-- ============ FOOTER ============ -->
+<footer class="bg-[var(--navy)] pt-16 pb-8 px-6 md:px-12">
+  <div class="max-w-6xl mx-auto grid md:grid-cols-2 gap-10">
+    <div>
+      <div class="shop-badge mb-5">
+        <img src="Untitled - 13 July 2026 at 01.05.27 (1).png" alt="Ride-N-Shine">
+      </div>
+      <h3 class="display text-3xl text-white mb-4">Find Us</h3>
+      <p class="text-[var(--steel)] flex items-start gap-3 mb-4">
+        <i class="fa-solid fa-location-dot text-[var(--red)] mt-1"></i>
+        Plot number 39, Ground floor, Nangloi road, near Bank of Baroda, Najafgarh, New Delhi
+      </p>
+      <a href="tel:8368695505" class="text-[var(--steel)] flex items-center gap-3 mb-2 hover:text-white transition-colors">
+        <i class="fa-solid fa-phone text-[var(--red)]"></i> 8368695505
+      </a>
+      <a href="tel:9310697002" class="text-[var(--steel)] flex items-center gap-3 mb-6 hover:text-white transition-colors">
+        <i class="fa-solid fa-phone text-[var(--red)]"></i> 9310697002
+      </a>
+      <a href="https://wa.me/918368695505"
+         target="_blank" rel="noopener"
+         class="rsvp-btn inline-flex items-center gap-3 text-white font-semibold px-7 py-3 rounded-full">
+        <i class="fa-brands fa-whatsapp text-xl"></i> Chat With Us
+      </a>
+    </div>
+    <div class="rounded-xl overflow-hidden border border-white/10 min-h-[260px]">
+      <iframe
+        title="Ride-N-Shine location map"
+        src="https://www.google.com/maps?q=Nangloi+Road+near+Bank+of+Baroda+Najafgarh+New+Delhi&output=embed"
+        width="100%" height="100%" style="min-height:260px; border:0;"
+        allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade">
+      </iframe>
+    </div>
+  </div>
+  <div class="max-w-6xl mx-auto border-t border-white/10 mt-12 pt-6 flex flex-col md:flex-row items-center justify-between gap-3">
+    <p class="eyebrow text-white text-lg">RIDE-N-SHINE</p>
+    <p class="text-[var(--steel)] text-sm">© 2026 Ride-N-Shine · Multi Brand Two Wheeler Showroom</p>
+  </div>
+</footer>
+
+<script>
+  // Envelope reveal
+  const gate = document.getElementById('gate');
+  const seal = document.getElementById('envSeal');
+  const envStage = document.getElementById('envStage');
+
+  function openEnvelope(){
+    if(gate.classList.contains('open')) return;
+    gate.classList.add('open');
+    document.body.classList.remove('locked');
+    setTimeout(() => {
+      gate.classList.add('hide');
+    }, 1250);
+    setTimeout(() => {
+      gate.style.display = 'none';
+    }, 2200);
+  }
+  seal.addEventListener('click', openEnvelope);
+  envStage.addEventListener('click', openEnvelope);
+
+  // Countdown to July 22, 2026, 9:00 AM IST
+  const target = new Date("2026-07-22T09:00:00+05:30").getTime();
+
+  function updateCountdown(){
+    const now = new Date().getTime();
+    const diff = target - now;
+
+    const els = {
+      d: document.getElementById('cd-days'),
+      h: document.getElementById('cd-hours'),
+      m: document.getElementById('cd-mins'),
+      s: document.getElementById('cd-secs')
+    };
+
+    if(diff <= 0){
+      els.d.textContent = '00'; els.h.textContent = '00';
+      els.m.textContent = '00'; els.s.textContent = '00';
+      return;
+    }
+
+    const days = Math.floor(diff / (1000*60*60*24));
+    const hours = Math.floor((diff % (1000*60*60*24)) / (1000*60*60));
+    const mins = Math.floor((diff % (1000*60*60)) / (1000*60));
+    const secs = Math.floor((diff % (1000*60)) / 1000);
+
+    els.d.textContent = String(days).padStart(2,'0');
+    els.h.textContent = String(hours).padStart(2,'0');
+    els.m.textContent = String(mins).padStart(2,'0');
+    els.s.textContent = String(secs).padStart(2,'0');
+  }
+
+  updateCountdown();
+  setInterval(updateCountdown, 1000);
+</script>
+
+<script src="https://cdn.tailwindcss.com"></script>
+</body>
+</html>
